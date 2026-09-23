@@ -1,4 +1,17 @@
 const uzTranslations = {
+  // home redesign
+  featured_categories: "Saralangan bo'limlar",
+  see_all: "Barchasi",
+  search_placeholder: "Mahsulotlarni qidirish...",
+  nav_cart: "Savatcha",
+  nav_profile: "Profil",
+  banner_delivery_title: "Uydan-Uygacha",
+  banner_delivery_sub: "Tez, qulay va ishonchli yetkazib berish xizmati",
+  banner_gift_title: "Sovg'a qidiryapsizmi?",
+  banner_gift_sub: "Yaqinlaringizni xursand qilish oson! Uy uchun kerakli va zamonaviy sovg'alar",
+  banner_promo_title: "Haftaning aksiyalari",
+  banner_promo_sub: "Chegirmadagi mahsulotlarni ko'ring",
+  vacancies_alt: "Uyda vakansiyalari — bizning jamoaga qo'shiling",
   // common
   yes: "Ha",
   no: "Yo'q",
@@ -229,6 +242,19 @@ const uzTranslations = {
 }
 
 const ruTranslations = {
+  // home redesign
+  featured_categories: "Популярные разделы",
+  see_all: "Все",
+  search_placeholder: "Поиск товаров...",
+  nav_cart: "Корзина",
+  nav_profile: "Профиль",
+  banner_delivery_title: "Из дома в дом",
+  banner_delivery_sub: "Быстрая, удобная и надёжная доставка",
+  banner_gift_title: "Ищете подарок?",
+  banner_gift_sub: "Порадовать близких легко! Нужные и современные подарки для дома",
+  banner_promo_title: "Акции недели",
+  banner_promo_sub: "Посмотрите товары со скидкой",
+  vacancies_alt: "Вакансии Uyda — присоединяйтесь к команде",
   ...uzTranslations,
   yes: "Да",
   no: "Нет",

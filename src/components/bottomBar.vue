@@ -1,31 +1,28 @@
 <template>
-  <!-- Floating QR code button at top-center -->
-  <router-link to="/barcode" class="qr-button" active-class="qr-button-active" title="QR Code">
-    <i class="bi bi-qr-code"></i>
-  </router-link>
-
-  <!-- Compact bottom navigation bar -->
-  <nav class="navbar fixed-bottom navbar-light bg-light shadow-sm">
-    <div class="container-fluid d-flex justify-content-around align-items-center">
-      <router-link to="/home" class="nav-link" active-class="active">
-        <i class="bi bi-house-door"></i>
-        <div class="nav-label">{{ t('home') }}</div>
-      </router-link>
-      <router-link to="/categories" class="nav-link text-center" active-class="active">
-        <i class="bi bi-list-ul"></i>
-        <div class="nav-label">{{ t('categories') }}</div>
-      </router-link>
-      <div style="flex: 0.5"></div> <!-- Spacer for QR button -->
-      <router-link to="/cart" class="nav-link text-center" active-class="active" aria-label="Cart">
-        <i class="bi bi-cart"></i>
-        <span v-if="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
-        <div class="nav-label">{{ t('cart') }}</div>
-      </router-link>
-      <router-link to="/profile" class="nav-link text-center" active-class="active">
-        <i class="bi bi-person-circle"></i>
-        <div class="nav-label">{{ t('map_nav') }}</div>
-      </router-link>
-    </div>
+  <!-- Suzib turuvchi pastki menyu -->
+  <nav class="uy-nav" aria-label="Asosiy menyu">
+    <router-link to="/home" class="uy-tab" active-class="active">
+      <span class="uy-tab-icon" v-html="icons.home"></span>
+      <span class="uy-tab-label">{{ t('home') }}</span>
+    </router-link>
+    <router-link to="/categories" class="uy-tab" active-class="active">
+      <span class="uy-tab-icon" v-html="icons.grid"></span>
+      <span class="uy-tab-label">{{ t('categories') }}</span>
+    </router-link>
+    <router-link to="/barcode" class="uy-qr" active-class="active" aria-label="QR · Sodiqlik kartasi">
+      <span v-html="icons.qr"></span>
+    </router-link>
+    <router-link to="/cart" class="uy-tab" active-class="active" :aria-label="t('nav_cart')">
+      <span class="uy-tab-icon">
+        <span v-html="icons.cart"></span>
+        <span v-if="cartCount > 0" class="uy-badge">{{ cartCount > 99 ? '99+' : cartCount }}</span>
+      </span>
+      <span class="uy-tab-label">{{ t('nav_cart') }}</span>
+    </router-link>
+    <router-link to="/profile" class="uy-tab" active-class="active">
+      <span class="uy-tab-icon" v-html="icons.user"></span>
+      <span class="uy-tab-label">{{ t('nav_profile') }}</span>
+    </router-link>
   </nav>
 </template>
 
@@ -33,6 +30,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Cart from '../lib/cart.js'
+import { icons } from '../lib/uiIcons.js'
 
 export default {
   name: "BottomNavbar",
@@ -69,113 +67,96 @@ export default {
       window.removeEventListener('cart-updated', updateCartCount)
     })
 
-    return { locale, t, cartCount }
+    return { locale, t, cartCount, icons }
   }
 };
 </script>
 
 <style scoped>
-/* Compact bottom navigation bar */
-.navbar {
-  height: 60px;
-  border-radius: 20px 20px 0 0;
+.uy-nav {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  height: 84px;
+  max-width: 520px;
   margin: 0 auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.98) !important;
-  border-top: 1px solid #e9ecef;
-}
-
-.navbar .container-fluid {
-  padding: 0.5rem 1rem;
-  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 28px rgba(17, 24, 39, 0.12);
+  z-index: 1000;
+  font-family: var(--uy-font);
 }
 
-.nav-link {
-  position: relative;
-  color: #6c757d;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.9rem;
-  transition: color 200ms ease;
+.uy-tab {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
+  gap: 6px;
+  color: var(--uy-muted);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.uy-tab.active { color: var(--uy-orange); }
+
+.uy-tab-icon {
+  position: relative;
+  display: inline-flex;
 }
 
-.nav-link.active, .nav-link.router-link-exact-active {
-  color: #0d6efd;
-}
-
-.nav-link i {
-  font-size: 1.3rem;
-  display: block;
-}
-
-.nav-label {
+.uy-tab-label {
   font-size: 11px;
-  font-weight: 500;
-  flex: 1;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.cart-badge {
+.uy-badge {
   position: absolute;
-  top: 4px;
-  right: 12px;
-  background: #ff3b30;
-  color: #fff;
-  border-radius: 999px;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: 700;
+  top: -7px;
+  right: -9px;
   min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #E53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
   text-align: center;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  box-shadow: 0 0 0 2px #fff;
 }
 
-/* Floating QR code button at top-center */
-.qr-button {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
+.uy-qr {
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  margin: 0 4px;
   border-radius: 50%;
-  background: #ff5722;
-  color: white;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
-  text-decoration: none;
-  transition: all 200ms ease;
-  z-index: 1050;
+  background: var(--uy-orange);
+  color: #fff;
+  border: 5px solid #fff;
+  box-shadow: 0 6px 18px rgba(239, 78, 36, 0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
 }
+.uy-qr:active { transform: scale(0.95); }
+.uy-qr span { display: inline-flex; }
 
-.qr-button:hover {
-  transform: translateX(-50%) scale(1.1);
-  box-shadow: 0 6px 16px rgba(255, 87, 34, 0.4);
-  color: white;
-  background: #e64a19;
-}
-
-.qr-button:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-.qr-button.qr-button-active {
-  background: #e64a19;
-}
-
-.qr-button i {
-  font-size: 1.8rem;
-  display: block;
+@media (max-width: 360px) {
+  .uy-tab-label { font-size: 9.5px; letter-spacing: 0.2px; }
+  .uy-qr { width: 66px; height: 66px; }
 }
 </style>

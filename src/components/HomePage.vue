@@ -1,25 +1,27 @@
 <template>
-  <div class="home-page container py-4">
-    <!-- Yangiliklar (news) -->
-    <section class="mb-3">
-      <h6 class="mb-2">{{ t('news') }}</h6>
-      <div class="stories d-flex gap-3 overflow-auto py-2">
-        <div v-for="(item, idx) in newsItems" :key="idx" class="story text-center">
-          <button 
-            class="story-button"
-            type="button" 
-            @click="showNews(idx)"
-            @touchend.stop.prevent="showNews(idx)"
-            :ref="el => setStoryRef(el, idx)"
-          >
-            <div class="story-ring">
-              <div class="story-circle">
-                <img :src="item.image" :alt="item.title" class="story-img" />
-              </div>
-            </div>
-            <div class="story-name small mt-1">{{ item.title }}</div>
-          </button>
-        </div>
+  <div class="home-page uy-home">
+    <!-- ② Banner karusel -->
+    <section class="uy-banner" aria-roledescription="carousel" :aria-label="t('news')"
+      @touchstart.passive="stopBannerAuto" @touchend.passive="startBannerAuto">
+      <div class="uy-banner-track" ref="bannerTrack" @scroll.passive="onBannerScroll">
+        <button v-for="(b, idx) in banners" :key="b.id" type="button"
+          class="uy-banner-slide" :class="'theme-' + (b.theme || 'orange')" @click="openBanner(b)"
+          :aria-label="t(b.titleKey)">
+          <img v-if="b.image" :src="bannerSrc(b)" :alt="t(b.titleKey)" class="uy-banner-img" loading="lazy" />
+          <template v-else>
+            <span class="uy-banner-copy">
+              <span class="uy-banner-title">{{ t(b.titleKey) }}</span>
+              <span class="uy-banner-sub">{{ t(b.subtitleKey) }}</span>
+            </span>
+            <span v-if="b.theme === 'promo'" class="uy-banner-collage" aria-hidden="true">
+              <img v-for="n in newsItems.slice(0, 3)" :key="n.id" :src="n.image" alt="" loading="lazy" />
+            </span>
+            <span v-else class="uy-banner-art" aria-hidden="true" v-html="b.theme === 'peach' ? giftArt : deliveryArt"></span>
+          </template>
+        </button>
+      </div>
+      <div class="uy-banner-dots" aria-hidden="true">
+        <span v-for="(b, idx) in banners" :key="'d' + b.id" :class="{ active: idx === bannerIndex }"></span>
       </div>
     </section>
 
@@ -35,15 +37,34 @@
       :quarterly-bonus="userData.data.saleQuarterly"
       :bonus-value="userData.data.balance" >
     </bonus-card>
-  
 
-    <collection v-if="userData?.data" :receipts="receipts" :current-receipt="currentReceipt" />
-    <!-- HR Jobs List View -->
-     <div class="banners">
-      <div class="banner" @click="$router.push('/jobs')">
-        <img src="../assets/img/uyda_vacation.png" alt="" style="width: 350px; height: 100px;">
+    <!-- ④ Saralangan bo'limlar -->
+    <section class="uy-cats" v-if="categoriesLoading || featuredCategories.length">
+      <div class="uy-section-head">
+        <h2>{{ t('featured_categories') }}</h2>
+        <router-link to="/categories" class="uy-see-all">{{ t('see_all') }}</router-link>
       </div>
-     </div>
+      <div class="uy-cats-grid">
+        <template v-if="categoriesLoading">
+          <div v-for="n in 8" :key="'sk' + n" class="uy-cat">
+            <span class="uy-cat-tile uy-skeleton"></span>
+            <span class="uy-cat-name uy-skeleton-line"></span>
+          </div>
+        </template>
+        <button v-else v-for="cat in featuredCategories" :key="cat.id" type="button" class="uy-cat" @click="openCategory(cat)">
+          <span class="uy-cat-tile" v-html="categoryIcon(cat.name)"></span>
+          <span class="uy-cat-name">{{ cat.name }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ⑤ ⑥ Qaynoq chegirmalar, Mijozlar tanlovi -->
+    <collection v-if="userData?.data" :receipts="receipts" :current-receipt="currentReceipt" />
+
+    <!-- ⑦ Vakansiyalar banneri -->
+    <button type="button" class="uy-vacancy" @click="$router.push('/jobs')">
+      <img src="../assets/img/uyda_vacation.png" :alt="t('vacancies_alt')" />
+    </button>
 
     <!-- News Modal -->
     <div v-if="showNewsModal" class="news-modal" @click="closeNewsModal">
@@ -120,6 +141,8 @@ import OverViewModal from './overViewModal.vue'
 import BonusCard from './BonusCard.vue'
 import HrPostCard from './hrPostCard.vue'
 import collection from './collection.vue'
+import { banners } from '../variable/banners.js'
+import { categoryIcon } from '../lib/uiIcons.js'
 
 // API instance
 const api = axios.create({
@@ -514,6 +537,76 @@ const submitOverview = async (payload) => {
     alert(err.response?.data?.message || err.message || 'Fikr yuborishda xatolik yuz berdi.')
   }
 }
+// ---------- ② Banner karusel
+const bannerTrack = ref(null)
+const bannerIndex = ref(0)
+let bannerTimer = null
+const deliveryArt = `<svg viewBox="0 0 160 110" xmlns="http://www.w3.org/2000/svg"><circle cx="118" cy="30" r="22" fill="#FFD27A" opacity=".9"/><rect x="8" y="34" width="86" height="50" rx="8" fill="#fff"/><rect x="16" y="42" width="30" height="20" rx="4" fill="#FDE3D9"/><path d="M94 50h28l16 18v16H94z" fill="#fff"/><path d="M100 56h18l10 12h-28z" fill="#BFD7EA"/><circle cx="34" cy="88" r="11" fill="#2A2A2A"/><circle cx="34" cy="88" r="4" fill="#ddd"/><circle cx="116" cy="88" r="11" fill="#2A2A2A"/><circle cx="116" cy="88" r="4" fill="#ddd"/><path d="M128 16c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#F7B733"/><circle cx="128" cy="28" r="4.5" fill="#fff"/></svg>`
+const giftArt = `<svg viewBox="0 0 160 110" xmlns="http://www.w3.org/2000/svg"><circle cx="110" cy="60" r="56" fill="#E9582E"/><ellipse cx="104" cy="64" rx="38" ry="35" fill="#FBF6EF" stroke="#E6DCCB" stroke-width="2"/><ellipse cx="104" cy="64" rx="26" ry="24" fill="none" stroke="#E6DCCB" stroke-width="1.5"/><ellipse cx="130" cy="82" rx="22" ry="20" fill="#fff" stroke="#E6DCCB" stroke-width="2"/><g fill="#D9534F"><circle cx="88" cy="50" r="2.2"/><circle cx="114" cy="44" r="2.2"/><circle cx="120" cy="72" r="2.2"/><circle cx="94" cy="84" r="2.2"/></g><path d="M40 30h16l-2 28a6 6 0 0 1-12 0z" fill="#fff" fill-opacity=".6" stroke="#fff" stroke-width="1.5"/><path d="M48 64v24M41 90h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`
+
+const onBannerScroll = () => {
+  const el = bannerTrack.value
+  if (!el || !el.clientWidth) return
+  bannerIndex.value = Math.round(el.scrollLeft / el.clientWidth)
+}
+const goBanner = (i) => {
+  const el = bannerTrack.value
+  if (!el) return
+  el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+}
+const stopBannerAuto = () => { if (bannerTimer) { clearInterval(bannerTimer); bannerTimer = null } }
+const startBannerAuto = () => {
+  stopBannerAuto()
+  if (banners.length < 2) return
+  bannerTimer = setInterval(() => goBanner((bannerIndex.value + 1) % banners.length), 5000)
+}
+const bannerSrc = (b) => (/^(https?:|data:)/.test(b.image) ? b.image : import.meta.env.BASE_URL + String(b.image).replace(/^\//, ''))
+const openBanner = (b) => {
+  if (b.action === 'news') { showNews(0); return }
+  if (b.link) router.push(b.link)
+}
+
+// ---------- ④ Saralangan bo'limlar (1C toifalari)
+const featuredCategories = ref([])
+const categoriesLoading = ref(true)
+const loadFeaturedCategories = async () => {
+  try {
+    const response = await api.get('/category')
+    const raw = response.data?.data || []
+    featuredCategories.value = raw
+      .map(c => ({ ...c, id: c.id || c.ID || c.categoryID }))
+      .filter(c => c.id && c.name && c.items !== 0)
+      .slice(0, 8)
+  } catch (e) {
+    console.warn('HomePage: toifalarni yuklab bo\'lmadi', e?.message)
+    featuredCategories.value = []
+  } finally {
+    categoriesLoading.value = false
+  }
+}
+// Toifani ochish: ichki toifalari bo'lsa Toifalar sahifasida, bo'lmasa mahsulotlar ro'yxatida
+const openCategory = async (cat) => {
+  try {
+    const response = await api.get('/category', { params: { categoryID: cat.id } })
+    const sub = (response.data?.data || []).map(c => ({ ...c, id: c.id || c.ID || c.categoryID }))
+    if (!sub.length) {
+      router.push({ name: 'products', params: { categoryId: cat.id } })
+      return
+    }
+    sessionStorage.setItem('categoriesViewState', JSON.stringify({
+      categories: sub, breadcrumb: [cat], currentCategoryId: cat.id, navigationDirection: 'forward'
+    }))
+    router.push({ name: 'categories' })
+  } catch (e) {
+    router.push({ name: 'products', params: { categoryId: cat.id } })
+  }
+}
+
+onMounted(() => {
+  loadFeaturedCategories()
+  startBannerAuto()
+})
+onBeforeUnmount(stopBannerAuto)
 </script>
 
 <style scoped>
@@ -907,4 +1000,159 @@ const submitOverview = async (payload) => {
     font-size: 24px;
   }
 }
+/* ===================== Bosh sahifa · yangi dizayn ===================== */
+.uy-home {
+  padding: 24px 18px 24px;
+  max-width: 560px;
+  margin: 0 auto;
+  font-family: var(--uy-font);
+}
+
+/* ② Banner */
+.uy-banner { position: relative; margin-bottom: 32px; }
+.uy-banner-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  border-radius: 22px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-shadow: 0 10px 26px rgba(239, 78, 36, 0.16);
+}
+.uy-banner-track::-webkit-scrollbar { display: none; }
+.uy-banner-slide {
+  position: relative;
+  flex: 0 0 100%;
+  aspect-ratio: 376 / 224;
+  scroll-snap-align: start;
+  border: 0;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.uy-banner-img { width: 100%; height: 100%; object-fit: cover; }
+.theme-orange { background: radial-gradient(120% 90% at 50% 120%, #E2421A 0%, #F05A2E 55%, #F47A4E 100%); color: #fff; }
+.theme-peach { background: linear-gradient(90deg, #F2C694 0%, #F4A866 100%); color: #2A2A2A; }
+.theme-promo { background: linear-gradient(120deg, #FFF3EC 0%, #FDE3D9 100%); color: #2A2A2A; }
+.uy-banner-copy {
+  position: relative;
+  z-index: 1;
+  width: 58%;
+  padding: 22px 0 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.uy-banner-title { font-size: 26px; font-weight: 900; line-height: 1.08; letter-spacing: -0.3px; }
+.theme-peach .uy-banner-title { color: #E9582E; }
+.theme-promo .uy-banner-title { color: var(--uy-orange); }
+.uy-banner-sub { font-size: 13px; font-weight: 700; line-height: 1.3; opacity: 0.92; }
+.uy-banner-art {
+  position: absolute;
+  right: -6px;
+  bottom: 0;
+  width: 52%;
+  height: 78%;
+  display: flex;
+  align-items: flex-end;
+}
+.uy-banner-art :deep(svg) { width: 100%; height: 100%; }
+.uy-banner-collage {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+}
+.uy-banner-collage img {
+  width: 78px;
+  height: 78px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 3px solid #fff;
+  margin-left: -26px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+.uy-banner-collage img:nth-child(2) { transform: translateY(-14px); }
+.uy-banner-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+.uy-banner-dots span { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.6); transition: width 0.25s ease; }
+.uy-banner-dots span.active { width: 18px; background: #fff; }
+
+/* Bo'lim sarlavhasi */
+.uy-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.uy-section-head h2 { margin: 0; font-size: 22px; font-weight: 900; color: var(--uy-text); letter-spacing: -0.2px; }
+.uy-see-all { font-size: 16px; font-weight: 900; color: var(--uy-orange); text-decoration: none; }
+
+/* ④ Saralangan bo'limlar */
+.uy-cats { margin-bottom: 32px; }
+.uy-cats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 12px; }
+.uy-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--uy-text);
+  -webkit-tap-highlight-color: transparent;
+}
+.uy-cat-tile {
+  width: 100%;
+  max-width: 82px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--uy-orange);
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.05);
+  transition: transform 0.15s ease;
+}
+.uy-cat:active .uy-cat-tile { transform: scale(0.95); }
+.uy-cat-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+.uy-skeleton { background: linear-gradient(90deg, #fff 25%, #f3f3f5 50%, #fff 75%); background-size: 200% 100%; animation: uy-shimmer 1.4s infinite; box-shadow: none; }
+.uy-skeleton-line { width: 70%; height: 12px; border-radius: 6px; background: #eceef1; }
+@keyframes uy-shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
+
+/* ⑦ Vakansiyalar */
+.uy-vacancy {
+  display: block;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(240, 83, 58, 0.22);
+  -webkit-tap-highlight-color: transparent;
+}
+.uy-vacancy img { display: block; width: 100%; height: auto; }
 </style>

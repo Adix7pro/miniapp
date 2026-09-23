@@ -174,3 +174,19 @@ button {
 .active {
   color: var(--bs-primary) !important;
 }
+
+
+/* ===== Uyda dizayn tokenlari (bosh sahifa yangilanishi) ===== */
+:root {
+  --uy-orange: #EF4E24;
+  --uy-orange-strong: #FF5722;
+  --uy-orange-soft: #FDE3D9;
+  --uy-text: #111827;
+  --uy-muted: #6B7280;
+  --uy-surface: #FFFFFF;
+  --uy-field: #ECEEF1;
+  --uy-font: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+body {
+  background: linear-gradient(180deg, #F7F3F4 0%, #EEF2F8 55%, #F8F1EE 100%) fixed;
+}

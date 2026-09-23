@@ -1,5 +1,5 @@
 <template>
-  <div class="collections-container" :style="{ height: collections.length > 0 ? height : '0px' }">
+  <div class="collections-container">
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <LoadingSpinner />
@@ -57,8 +57,8 @@
                   <div class="old-price">
                     
                   </div>
-                  <h3 class="product-price" style="font-size: 20px;">{{ formatPrice(product.price) }} <span style="font-size: 10px;">UZS</span></h3>
-                  <h3 v-if="product.oldPrice" class="product-price" style="font-size: 14px; text-decoration: line-through; color: #999;">
+                  <h3 class="product-price">{{ formatPrice(product.price) }} <span>UZS</span></h3>
+                  <h3 v-if="product.oldPrice" class="product-old-price">
                       {{ formatPrice(product.oldPrice) }}
                     </h3>
                   <h3 class="product-name">{{ product.name }}</h3>
@@ -180,13 +180,11 @@ const loadCartMap = async () => {
 } 
 
 // Price formatter
+// Narxni "24 000" ko'rinishida chiqaradi (1C narxni son yoki "24 000" matni sifatida berishi mumkin)
 const formatPrice = (price) => {
-  const n = Number(price) || 0
-  try {
-    return price.toLocaleString( {  minimumFractionDigits: 0 })
-  } catch (e) {
-    return String(n)
-  }
+  const n = Number(String(price ?? '').replace(/[^\d.]/g, ''))
+  if (!Number.isFinite(n)) return String(price ?? '')
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 
@@ -501,11 +499,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.collections-container {
-  padding: 16px;
-}
+/* Bosh sahifa · "Qaynoq chegirmalar", "Mijozlar tanlovi" karusellari */
+.collections-container { padding: 0; margin-bottom: 32px; font-family: var(--uy-font); }
 
-/* Loading and Error States */
 .loading-state,
 .error-state,
 .empty-state {
@@ -514,378 +510,173 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  min-height: 300px;
+  min-height: 200px;
 }
+.error-message { color: #d32f2f; margin-bottom: 16px; text-align: center; }
+.retry-btn { padding: 10px 20px; background: var(--uy-orange-strong); color: #fff; border: none; border-radius: 12px; font-weight: 800; }
 
-.error-message {
-  color: #d32f2f;
-  margin-bottom: 20px;
-  text-align: center;
-}
+.collections-list { display: flex; flex-direction: column; gap: 32px; }
+.collection-section { display: flex; flex-direction: column; gap: 16px; }
 
-.retry-btn {
-  padding: 10px 20px;
-  background: #ff5722;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.retry-btn:hover {
-  background: #e64a19;
-}
-
-.empty-state i {
-  font-size: 48px;
-  color: #ccc;
-  margin-bottom: 16px;
-}
-
-.empty-state p {
-  color: #666;
-  font-size: 14px;
-}
-
-/* Collections List */
-.collections-list {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.collection-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.collection-header {
-  padding: 0 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+.collection-header { display: flex; align-items: center; gap: 10px; }
 .collection-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
-  margin: 0;
   flex: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--uy-text);
+  letter-spacing: -0.2px;
 }
-
 .collection-badge {
-  min-width: 28px;
+  flex-shrink: 0;
+  min-width: 34px;
   height: 28px;
   padding: 0 10px;
-  border-radius: 999px;
-  background: #fff1ea;
-  color: #ff5722;
-  border: 1px solid #ffd3c2;
-  font-size: 12px;
-  font-weight: 700;
+  border-radius: 10px;
+  background: var(--uy-orange-soft);
+  color: var(--uy-orange);
+  font-size: 14px;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
-  flex-shrink: 0;
 }
-
 .view-all-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   border: none;
-  background: #f5f5f5;
-  color: #ff5722;
   border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #E9E9EE;
+  color: #374151;
   font-size: 16px;
-  transition: all 0.2s ease;
-}
-
-.view-all-btn:hover {
-  background: #ff5722;
-  color: white;
-}
-
-/* Carousel */
-.carousel-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: auto;
-}
-
-.carousel-arrow {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: #f5f5f5;
-  color: #ff5722;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  transition: all 0.3s ease;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%)
-}
- .right-arrow {
-  right: 10px;
-}
-.left-arrow {
-  left: 10px;
-  z-index: 11;
 }
 
-.carousel-arrow:hover:not(:disabled) {
-  background: #ff5722;
-  color: white;
-}
-
-.carousel-arrow:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.carousel-container {
-  flex: 1;
-  overflow: hidden;
-  border-radius: 12px;
-  min-height: 240px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 100%;
-}
-
+/* Karusel: barmoq bilan suriladi, strelkalar kerak emas */
+.carousel-wrapper { position: relative; margin: 0 -18px; }
+.carousel-arrow { display: none; }
+.carousel-container { overflow: visible; }
 .carousel-track {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 8px 12px;
-  height: 100%;
-  min-width: 100%;
-  /* Hide scrollbar */
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 18px;
+  padding: 4px 18px 20px;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  align-items: center;
-
 }
-
-.carousel-track::-webkit-scrollbar {
-  display: none;
-}
+.carousel-track::-webkit-scrollbar { display: none; }
 
 .carousel-item {
-  flex-shrink: 0;
-  width: 170px;
-  height: auto;
-  max-height: 500px;
-  background: white;
-  border-radius: 12px;
+  /* Bootstrap'ning .carousel-item uslubini (margin-right: -100%, float) bekor qilamiz */
+  margin-right: 0 !important;
+  float: none;
+  transition: none;
+  flex: 0 0 168px;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+  background: #fff;
+  border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0,0,0,0.04);
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  margin-right: 0 !important;
+  box-shadow: 0 8px 20px rgba(239, 78, 36, 0.1);
   position: relative;
 }
 
-
-.carousel-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.carousel-item.more-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #ff5722 0%, #ffb26e 100%);
-}
-
-.more-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: white;
-  text-align: center;
-}
-
-.more-content i {
-  font-size: 32px;
-}
-
-.more-content p {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0;
-}
-
-/* Product Image */
 .product-image {
-  position: relative;
   width: 100%;
-  height: 220px;
-  background: #f5f5f5;
-  overflow: hidden;
+  height: 150px;
   flex-shrink: 0;
+  background: #fff;
+  overflow: hidden;
 }
+.product-image img { width: 100%; height: 100%; object-fit: cover; }
 
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.out-of-stock {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: center;
-  padding: 8px;
-}
-
-/* Product Info */
 .product-info {
-  padding: 10px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 4px;
+  padding: 10px 12px 8px;
 }
-
+.product-price {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--uy-orange);
+  font-family: var(--uy-font);
+}
+.product-price span { font-size: 12px; font-weight: 800; }
+.product-old-price { margin: 0; font-size: 13px; font-weight: 700; color: #9CA3AF; text-decoration: line-through; }
 .product-name {
+  margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-  line-height: 1.35;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1F2937;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.product-stock {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
-  font-weight: 500;
-}
-
-.product-stock.low-stock {
-  color: #ff9800;
-  font-weight: 600;
-}
-
-/* Add to Cart Button */
+/* Savatga qo'shish */
 .cart-btn {
-  width: 100%;
-  padding: 10px;
-  background: #ff5722;
-  color: white;
+  margin: 4px 12px 12px;
+  height: 48px;
   border: none;
-  cursor: pointer;
+  border-radius: 14px;
+  background: var(--uy-orange-strong);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: none;
-  border-radius: 0 0 12px 12px;
+  font-size: 20px;
+  transition: transform 0.15s ease, opacity 0.2s ease;
 }
+.cart-btn i { font-size: 20px !important; }
+.cart-btn:active:not(:disabled) { transform: scale(0.97); }
+.cart-btn:disabled { opacity: 0.5; }
 
-.cart-btn:hover:not(:disabled) {
-  background: #ff7043;
-  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.3);
-}
-
-.cart-btn:active:not(:disabled) {
-  background: #ff5722;
-}
-
-.cart-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Quantity controls for inline product cards (reuse cartView style) */
-.qty-controls { display:flex; align-items:center; gap:8px; transition: opacity 0.2s; margin: auto; text-align: center; margin-bottom: 5px;}
-.qty-controls.disabled { opacity: 0.5; pointer-events: none }
-.qty-controls button { width:28px; height:28px; border-radius:6px; border:1px solid #eee; background:white; font-size:14px; cursor: pointer }
-.qty-controls button:disabled { opacity: 0.6; cursor: not-allowed }
-.qty-controls input { width:48px; text-align:center; padding:6px; border-radius:6px; border:1px solid #eee; font-size:13px; text-align: center; }
-
-
-
-/* Responsive */
-@media (max-width: 480px) {
-  .collections-container {
-    padding: 12px;
-  }
-
-  .collection-section {
-    gap: 8px;
-  }
-
-  .carousel-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
-
-  .carousel-item {
-    width: 140px;
-  }
-
-  .product-image {
-    height: 180px;
-  }
-
-  .product-name {
-    font-size: 11px;
-  }
-
-  .collection-title {
-    font-size: 16px;
-  }
-}
-.view-all-btn {
-  background: none;
-  border: none;
-  color: #ff5722;
-  cursor: pointer;
-  font-size: 18px;
+/* Miqdor stepperi (mahsulot savatchada bo'lsa) */
+.qty-controls {
+  margin: 4px 12px 12px;
+  height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 0 6px 0 8px;
+  border-radius: 14px;
+  background: var(--uy-orange-soft);
+}
+.qty-controls.disabled { opacity: 0.5; pointer-events: none; }
+.qty-controls button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--uy-orange);
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+.qty-controls button:last-child { background: #fff; }
+.qty-controls button:disabled { opacity: 0.45; }
+.qty-controls input {
+  width: 36px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--uy-orange);
+  font-family: var(--uy-font);
 }
 </style>

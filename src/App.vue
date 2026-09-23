@@ -300,7 +300,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="header" v-if="showBars">
       <div class="brand-bar">
-        <p>Uyda Loyalty</p>
+        <p>Uydan Uygacha</p>
       </div>
 
       <div class="header-spacer" v-if="!route.path.startsWith('/collection') && !route.path.startsWith('/product/')"></div>
@@ -340,7 +340,7 @@ onBeforeUnmount(() => {
   z-index: 2000;
 }
 ._bottom-space{
-  height: 100px;
+  height: 120px;
   position: relative;
 }
 
@@ -353,24 +353,24 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid #e9ecef;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
   z-index: 999;
 }
 
 .brand-bar p {
-  margin: 5px;
-  padding-top: 18px;
-  font-size: 20px;
+  margin: 0;
+  font-family: var(--uy-font);
+  font-size: 24px;
   font-weight: 900;
-  color: #ff5722;
-  letter-spacing: 0.5px;
+  color: var(--uy-orange);
+  letter-spacing: -0.2px;
 }
 
-/* Spacer for fixed header */
+/* Spacer for fixed header (brand 70px + qidiruv 84px) */
 .header-spacer {
-  height: 120px;
+  height: 154px;
 }
 </style>

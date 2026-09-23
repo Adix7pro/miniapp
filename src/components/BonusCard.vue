@@ -1,66 +1,40 @@
 <template>
-  <div class="bonus-card-container">
-    <div 
-      ref="cardRef"
-      class="bonus-card-tilt"
-      data-tilt>
-    <!-- Main bonus value (clickable to expand/collapse) -->
-    <div class="bonus-header" @click="toggleCollapse" style="cursor: pointer;">
-      <div>
-        <div class="bonus-main-label">{{ t('total_bonus') || 'Jami bonus' }}</div>
-        <div class="bonus-main-value">{{ formatNumber(bonusValue) }} <span style="font-size: 16px;">{{ t('sum') || 'so\'m' }}</span></div>
-      </div>
-      <div class="expand-icon" :class="{ expanded: !isCollapsed }">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-    </div>
+  <section class="uy-bonus" :class="{ open: isCollapsed }">
+    <!-- Asosiy qism: jami bonus (bosilsa oylik/choraklik tafsilot ochiladi) -->
+    <button class="uy-bonus-head" type="button" @click="toggleCollapse" :aria-expanded="isCollapsed">
+      <span class="uy-bonus-text">
+        <span class="uy-bonus-label">{{ t('total_bonus') }}</span>
+        <span class="uy-bonus-value">{{ formatNumber(bonusValue) }}<small>{{ t('sum') }}</small></span>
+      </span>
+      <span class="uy-bonus-toggle" v-html="icons.chevronUp"></span>
+    </button>
 
-    <!-- Categories breakdown (collapsible) -->
-    <div v-show="isCollapsed" class="bonus-categories">
-      <!-- Monthly bonus -->
-      <div class="bonus-category">
-        <div class="category-header">
-          <div class="category-label">{{ t('monthly_bonus') || 'Oylik' }}</div>
-          <div class="category-value">{{ formatNumber(monthlyBonus) }}</div>
+    <!-- Tafsilot: oylik va choraklik xaridlar -->
+    <div v-show="isCollapsed" class="uy-bonus-details">
+      <div class="uy-bonus-row">
+        <div class="uy-bonus-row-head">
+          <span>{{ t('monthly_bonus') }}</span>
+          <strong>{{ formatNumber(monthlyBonus) }} {{ t('sum') }}</strong>
         </div>
-        <div class="progress-bar-wrapper">
-          <div class="progress-bar">
-            <div 
-              class="progress-fill progress-monthly" 
-              :style="{ width: monthlyProgressPercent + '%' }">
-            </div>
-          </div>
-          <div class="progress-label">{{ monthlyProgressPercent.toFixed(0) }}%</div>
-        </div>
+        <div class="uy-progress"><div class="uy-progress-fill" :style="{ width: monthlyProgressPercent + '%' }"></div></div>
+        <div class="uy-bonus-percent">{{ monthlyProgressPercent.toFixed(0) }}%</div>
       </div>
-
-      <!-- Quarterly bonus -->
-      <div class="bonus-category">
-        <div class="category-header">
-          <div class="category-label">{{ t('quarterly_bonus') || 'Choraklik' }}</div>
-          <div class="category-value">{{ formatNumber(quarterlyBonus) }}</div>
+      <div class="uy-bonus-row">
+        <div class="uy-bonus-row-head">
+          <span>{{ t('quarterly_bonus') }}</span>
+          <strong>{{ formatNumber(quarterlyBonus) }} {{ t('sum') }}</strong>
         </div>
-        <div class="progress-bar-wrapper">
-          <div class="progress-bar">
-            <div 
-              class="progress-fill progress-quarterly" 
-              :style="{ width: quarterlyProgressPercent + '%' }">
-            </div>
-          </div>
-          <div class="progress-label">{{ quarterlyProgressPercent.toFixed(0) }}%</div>
-        </div>
+        <div class="uy-progress"><div class="uy-progress-fill" :style="{ width: quarterlyProgressPercent + '%' }"></div></div>
+        <div class="uy-bonus-percent">{{ quarterlyProgressPercent.toFixed(0) }}%</div>
       </div>
     </div>
-    </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { defineProps, computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
-import VanillaTilt from 'vanilla-tilt'
+import { icons } from '../lib/uiIcons.js'
 
 const { t } = useI18n()
 const cardRef = ref(null)
@@ -122,189 +96,81 @@ const formatNumber = (num) => {
 </script>
 
 <style scoped>
-/* Perspective container for 3D effect */
-.bonus-card-container {
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  margin-top: 0px;
-}
-
-.bonus-card-tilt {
-  transform-style: preserve-3d;
-  transition: transform 0.3s ease;
-  width: 100%;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  color: #333;
-}
-
-/* Main bonus header */
-.bonus-header {
-  margin: -20px -20px 16px -20px;
-  padding: 24px 20px;
-  background: linear-gradient(135deg, #ff5722 0%, #ffb26e 100%);
-  border-radius: 12px 12px 0 0;
-  position: relative;
+.uy-bonus {
+  margin: 0 0 32px;
+  border-radius: 26px;
+  background: linear-gradient(100deg, #FF5A1F 0%, #FF9A72 100%);
+  box-shadow: 0 12px 28px rgba(255, 90, 31, 0.28);
+  color: #fff;
+  font-family: var(--uy-font);
   overflow: hidden;
+}
+
+.uy-bonus-head {
+  width: 100%;
+  min-height: 150px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  transition: opacity 0.3s ease;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 28px;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.bonus-header:hover {
-  opacity: 0.95;
-}
+.uy-bonus-text { display: flex; flex-direction: column; gap: 8px; }
 
-.bonus-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.bonus-main-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+.uy-bonus-label {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 1;
+  opacity: 0.88;
 }
 
-.bonus-main-value {
-  font-size: 36px;
-  font-weight: 700;
-  color: white;
+.uy-bonus-value {
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  position: relative;
-  z-index: 1;
+}
+.uy-bonus-value small {
+  margin-left: 6px;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0;
 }
 
-/* Expand/Collapse icon */
-.expand-icon {
-  display: flex;
+.uy-bonus-toggle {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
-  flex-shrink: 0;
-  margin-left: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: transform 0.25s ease;
+}
+.uy-bonus.open .uy-bonus-toggle { transform: rotate(180deg); }
+
+.uy-bonus-details {
+  display: grid;
+  gap: 14px;
+  margin: 0 16px 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
-.expand-icon.expanded {
-  transform: rotate(180deg);
-}
-
-/* Categories breakdown */
-.bonus-categories {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.bonus-category {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.category-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.category-value {
-  font-size: 15px;
-  font-weight: 700;
-  color: #333;
-}
-
-/* Progress bar styles */
-.progress-bar-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.progress-monthly {
-  background: linear-gradient(90deg, #ff5722, #ffb26e);
-}
-
-.progress-quarterly {
-  background: linear-gradient(90deg, #ff9100, #ffcc80);
-}
-
-.progress-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ff5722;
-  min-width: 32px;
-  text-align: right;
-}
-
-/* Responsive design */
-@media (max-width: 480px) {
-  .bonus-card-container {
-    padding: 16px;
-  }
-
-  .bonus-main-value {
-    font-size: 28px;
-  }
-
-  .bonus-categories {
-    gap: 10px;
-  }
-
-  .category-label {
-    font-size: 12px;
-  }
-
-  .category-value {
-    font-size: 13px;
-  }
-}
+.uy-bonus-row { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center; }
+.uy-bonus-row-head { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; }
+.uy-bonus-row-head strong { font-weight: 900; }
+.uy-progress { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.uy-progress-fill { height: 100%; border-radius: 4px; background: #fff; transition: width 0.4s ease; }
+.uy-bonus-percent { font-size: 12px; font-weight: 800; opacity: 0.9; min-width: 36px; text-align: right; }
 </style>

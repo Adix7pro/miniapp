@@ -1,125 +1,77 @@
 <template>
-
-
-    <!-- Main header -->
-    <header class="modern-header">
-      <div class="header-content">
-        <router-link to="/search" class="search-link" title="Search">
-          <input type="text" placeholder="Mahsulotlarni qidirish..." class="search-input" />
-        </router-link>
-        <router-link to="/search" class="search-link" title="Search">
-          <i class="fas fa-search" style="font-size:20px;color:#444;margin-right:20px;"></i>
-        </router-link>
-        <router-link to="/map" class="profile-link">
-          <i class="bi bi-geo-alt-fill" style="font-size:20px;color:#444;"></i>
-        </router-link>
-      </div>
-    </header>
+  <!-- Qidiruv paneli: brend satri ostida qotib turadi -->
+  <header class="uy-search-bar">
+    <router-link to="/search" class="uy-search" :aria-label="t('search_placeholder')">
+      <span class="uy-search-icon" v-html="icons.search"></span>
+      <span class="uy-search-placeholder">{{ t('search_placeholder') }}</span>
+      <span class="uy-search-camera" v-html="icons.camera"></span>
+    </router-link>
+    <router-link to="/map" class="uy-location" aria-label="Filiallar xaritasi">
+      <span v-html="icons.pin"></span>
+    </router-link>
+  </header>
 </template>
 
 <style scoped>
-/* Brand bar at top */
-
-
-/* Modern header */
-.modern-header {
+.uy-search-bar {
   position: fixed;
   top: 70px;
   left: 0;
   right: 0;
-  height: 70px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-bottom: 1px solid #e9ecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  height: 84px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px 0 18px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.05);
   z-index: 998;
+  font-family: var(--uy-font);
 }
 
-.header-content {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.uy-search {
   flex: 1;
-}
-
-.logo-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.user-text {
+  min-width: 0;
+  height: 52px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: var(--uy-field);
+  color: var(--uy-muted);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.uy-search:active { background: #E3E6EA; }
+
+.uy-search-icon,
+.uy-search-camera,
+.uy-location span {
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
-.user-name {
-  margin: 0;
+.uy-search-placeholder {
+  flex: 1;
+  min-width: 0;
   font-size: 16px;
-  font-weight: 700;
-  color: #1f2937;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.loading-skeleton {
-  width: 160px;
-  height: 20px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 4px;
-}
-
-.profile-link {
-  display: flex;
+.uy-location {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 44px;
+  color: var(--uy-orange);
   text-decoration: none;
-}
-
-.profile-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e9ecef;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.profile-img:hover {
-  border-color: #ff5722;
-  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.2);
-  transform: scale(1.05);
-}
-.search-input {
-  min-width: 250px;
-  width: 80%;
-  padding: 8px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  transition: all 200ms ease;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
 }
 </style>
 
@@ -128,6 +80,10 @@ import { ref, onMounted } from 'vue'
 import { API } from '../variable/link.js'
 import axios from 'axios'
 import { getChatID, getProfileImg } from '../variable/chat.js'
+import { useI18n } from 'vue-i18n'
+import { icons } from '../lib/uiIcons.js'
+
+const { t } = useI18n()
 
 const userData = ref(null)
 const img = ref('https://cdn-icons-png.flaticon.com/512/149/149071.png')
@@ -165,4 +121,4 @@ const getUserData = async () => {
 onMounted(async () => {
   await getUserData()
 })
-</script>
+</script>
