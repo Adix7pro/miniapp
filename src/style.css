@@ -1,0 +1,176 @@
+/* Theme variables for consistent colors */
+:root {
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-text: #212529;
+  --color-muted: #6c757d;
+
+  /* Primary color and its variations */
+  --bs-primary: #ff7900;
+  --bs-primary-rgb: 255, 121, 0;
+  --bs-primary-darker: #cc6100;
+  --bs-primary-lighter: #ff8f26;
+  --bs-primary-hover: #e66d00;
+  --bs-primary-active: #cc6100;
+  --bs-primary-subtle: #fff4eb;
+  --bs-primary-border-subtle: #ffd4b3;
+  --bs-primary-text-emphasis: #663200;
+
+  /* Keep mirrored variables for compatibility */
+  --color-primary: var(--bs-primary);
+  --text-primary: var(--bs-primary);
+  --color-primary-contrast: #ffffff;
+  --color-secondary: #6c757d;
+
+  --avatar-bg: #6c757d;
+}
+
+/* Basic layout */
+html, body, #app {
+  height: 100%;
+}
+.text-primary {
+  color: var(--bs-primary) !important;
+  transition: color 0.3s ease;
+}
+
+.text-primary:hover {
+  color: var(--bs-primary-hover) !important;
+}
+
+/* Links with primary color */
+a.text-primary {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a.text-primary:hover {
+  color: var(--bs-primary-hover) !important;
+  text-decoration: underline;
+}
+
+/* Form controls with primary color */
+.form-control:focus {
+  border-color: var(--bs-primary-border-subtle) !important;
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+}
+
+/* Progress bars */
+.progress-bar {
+  background-color: var(--bs-primary) !important;
+}
+
+/* Badge primary */
+.badge.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+.badge.bg-primary-subtle {
+  color: var(--bs-primary-text-emphasis) !important;
+  background-color: var(--bs-primary-subtle) !important;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Card surface */
+.card {
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+}
+
+/* Buttons theme overrides */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--bs-primary-hover) !important;
+  border-color: var(--bs-primary-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.35) !important;
+}
+
+.btn-primary:active {
+  background-color: var(--bs-primary-active) !important;
+  border-color: var(--bs-primary-active) !important;
+  transform: translateY(0);
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  background-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-outline-primary:hover {
+  color: #fff !important;
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.2) !important;
+}
+
+.btn-outline-primary:active {
+  background-color: var(--bs-primary-hover) !important;
+  border-color: var(--bs-primary-hover) !important;
+  transform: translateY(0);
+}
+
+/* Avatar placeholder */
+.avatar-placeholder {
+  background: var(--avatar-bg);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Alerts subtle adjustments */
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* Small helpers */
+button {
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #ffffff;
+    --color-surface: rgba(255,255,255,0.02);
+    --color-text: #232323;
+    --color-muted: #9aa6b2;
+    --avatar-bg: #2b3a4b;
+  }
+  :root {
+  --bs-primary: #ff5722;
+}
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+  .card { background: var(--color-surface); }
+}
+.active {
+  color: var(--bs-primary) !important;
+}
