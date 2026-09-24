@@ -1,3 +1,4 @@
+Banners · JS
 // Bosh sahifadagi banner karuseli.
 // Rasm bilan banner qo'shish: rasmni public/banners/ papkasiga qo'ying (tavsiya: 1200x720, 5:3)
 // va { image: 'banners/fayl-nomi.jpg', link: '/categories' } ko'rinishida qo'shing.
@@ -17,11 +18,5 @@ export const banners = [
     theme: 'peach',
     link: '/categories',
   },
-  {
-    id: 'promo',
-    titleKey: 'banner_promo_title',
-    subtitleKey: 'banner_promo_sub',
-    theme: 'promo',
-    action: 'news', // "Yangiliklar" oynasini ochadi
-  },
 ]
+ 

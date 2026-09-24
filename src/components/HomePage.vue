@@ -13,10 +13,7 @@
               <span class="uy-banner-title">{{ t(b.titleKey) }}</span>
               <span class="uy-banner-sub">{{ t(b.subtitleKey) }}</span>
             </span>
-            <span v-if="b.theme === 'promo'" class="uy-banner-collage" aria-hidden="true">
-              <img v-for="n in newsItems.slice(0, 3)" :key="n.id" :src="n.image" alt="" loading="lazy" />
-            </span>
-            <span v-else class="uy-banner-art" aria-hidden="true" v-html="b.theme === 'peach' ? giftArt : deliveryArt"></span>
+            <span class="uy-banner-art" aria-hidden="true" v-html="b.theme === 'peach' ? giftArt : deliveryArt"></span>
           </template>
         </button>
       </div>
@@ -542,7 +539,32 @@ const bannerTrack = ref(null)
 const bannerIndex = ref(0)
 let bannerTimer = null
 const deliveryArt = `<svg viewBox="0 0 160 110" xmlns="http://www.w3.org/2000/svg"><circle cx="118" cy="30" r="22" fill="#FFD27A" opacity=".9"/><rect x="8" y="34" width="86" height="50" rx="8" fill="#fff"/><rect x="16" y="42" width="30" height="20" rx="4" fill="#FDE3D9"/><path d="M94 50h28l16 18v16H94z" fill="#fff"/><path d="M100 56h18l10 12h-28z" fill="#BFD7EA"/><circle cx="34" cy="88" r="11" fill="#2A2A2A"/><circle cx="34" cy="88" r="4" fill="#ddd"/><circle cx="116" cy="88" r="11" fill="#2A2A2A"/><circle cx="116" cy="88" r="4" fill="#ddd"/><path d="M128 16c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#F7B733"/><circle cx="128" cy="28" r="4.5" fill="#fff"/></svg>`
-const giftArt = `<svg viewBox="0 0 160 110" xmlns="http://www.w3.org/2000/svg"><circle cx="110" cy="60" r="56" fill="#E9582E"/><ellipse cx="104" cy="64" rx="38" ry="35" fill="#FBF6EF" stroke="#E6DCCB" stroke-width="2"/><ellipse cx="104" cy="64" rx="26" ry="24" fill="none" stroke="#E6DCCB" stroke-width="1.5"/><ellipse cx="130" cy="82" rx="22" ry="20" fill="#fff" stroke="#E6DCCB" stroke-width="2"/><g fill="#D9534F"><circle cx="88" cy="50" r="2.2"/><circle cx="114" cy="44" r="2.2"/><circle cx="120" cy="72" r="2.2"/><circle cx="94" cy="84" r="2.2"/></g><path d="M40 30h16l-2 28a6 6 0 0 1-12 0z" fill="#fff" fill-opacity=".6" stroke="#fff" stroke-width="1.5"/><path d="M48 64v24M41 90h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`
+const giftArt = `<svg viewBox="0 0 180 130" xmlns="http://www.w3.org/2000/svg">
+  <!-- Backdrop circle -->
+  <circle cx="110" cy="65" r="62" fill="#E9582E" opacity="0.18"/>
+  <!-- Large dinner plate -->
+  <ellipse cx="105" cy="72" rx="44" ry="40" fill="#FBF6EF" stroke="#E6DCCB" stroke-width="2.5"/>
+  <ellipse cx="105" cy="72" rx="31" ry="28" fill="none" stroke="#E6DCCB" stroke-width="1.5"/>
+  <ellipse cx="105" cy="72" rx="14" ry="13" fill="none" stroke="#E6DCCB" stroke-width="1"/>
+  <!-- Flower/pattern on plate -->
+  <g fill="#D9534F" opacity="0.7">
+    <circle cx="90" cy="58" r="2.5"/>
+    <circle cx="118" cy="54" r="2.5"/>
+    <circle cx="126" cy="80" r="2.5"/>
+    <circle cx="96" cy="90" r="2.5"/>
+    <circle cx="112" cy="88" r="2"/>
+  </g>
+  <!-- Small bowl (right) -->
+  <ellipse cx="138" cy="90" rx="22" ry="18" fill="#FBF6EF" stroke="#E6DCCB" stroke-width="2"/>
+  <ellipse cx="138" cy="90" rx="14" ry="11" fill="none" stroke="#E6DCCB" stroke-width="1"/>
+  <!-- Wine glass (left) -->
+  <path d="M68 38 Q76 56 80 60 L76 80 L72 80 L76 80 L76 92 L62 92 L90 92 L90 80 L86 80 L86 60 Q90 56 98 38 Z" fill="none" stroke="#E8C4B0" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M70 40 Q79 56 79 60 Q87 56 95 40 Z" fill="#F2DCCe" opacity="0.5"/>
+  <!-- Small decorative circles -->
+  <circle cx="55" cy="75" r="3" fill="#E9582E" opacity="0.3"/>
+  <circle cx="160" cy="45" r="5" fill="#E9582E" opacity="0.2"/>
+  <circle cx="150" cy="105" r="4" fill="#E9582E" opacity="0.25"/>
+</svg>`
 
 const onBannerScroll = () => {
   const el = bannerTrack.value
@@ -1053,10 +1075,10 @@ onBeforeUnmount(stopBannerAuto)
 .uy-banner-sub { font-size: 13px; font-weight: 700; line-height: 1.3; opacity: 0.92; }
 .uy-banner-art {
   position: absolute;
-  right: -6px;
-  bottom: 0;
-  width: 52%;
-  height: 78%;
+  right: -10px;
+  bottom: -4px;
+  width: 54%;
+  height: 92%;
   display: flex;
   align-items: flex-end;
 }
