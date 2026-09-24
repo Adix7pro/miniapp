@@ -1,3 +1,4 @@
+
 Banners · JS
 // Bosh sahifadagi banner karuseli.
 // Rasm bilan banner qo'shish: rasmni public/banners/ papkasiga qo'ying (tavsiya: 1200x720, 5:3)
